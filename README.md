@@ -1,37 +1,34 @@
-# Matt's Oxlint config
+# Matt's TypeScript starting recommendations
 
 These are my personal recommendations for starting a new TypeScript project. If I were starting a new project from scratch today, this is what I would use.
 
-All anti-slop and shadcn lint rules are enabled as errors. This is an opinionated starting point that I intend to expand over time.
+## The list
 
-## Use it
+| Tool | What I want |
+| --- | --- |
+| [Oxlint](https://oxc.rs/docs/guide/usage/linter.html) | The lint runner, including `oxc/no-accumulating-spread`. |
+| [anti-slop](https://github.com/dmmulroy/anti-slop) | All rules, including the Effect-specific rules, enforced as errors. |
+| [shadcn lint](https://github.com/shadcn-ui/lint) | All rules enforced as errors, with the project's actual UI components and theme configured. |
 
-Requires Node.js 24 or newer and Oxlint 1.83.0. This package is installed from GitHub; it is not published to npm.
+I'll add more recommendations here as I find things I want in new projects.
 
-```sh
-npm install --save-dev oxlint@1.83.0 github:mattlgroff/oxlint-config#v0.1.0
-```
+## Give this to your agent
 
-Set `"type": "module"` in your project's `package.json`, then create `oxlint.config.ts`:
+Copy the [setup prompt](./SETUP-PROMPT.md) into your coding agent while working in the new project's repository. The agent should get the tools from their upstream sources and configure them for that project.
 
-```ts
-import { defineConfig } from 'oxlint';
-import matt from '@mattlgroff/oxlint-config';
+This repository is a recommendations list. There is nothing here to install. The earlier `v0.1.0` tag contains a package experiment; use this guide for new setups.
 
-export default defineConfig(matt);
-```
+## My policy
 
-Run `npx oxlint`. An enabled rule violation returns a failing exit code. Your project's existing lint command can run this config; merge blocking still depends on your repository requiring that check. This package does not install or modify GitHub Actions.
+Enable all rules. Don't silently substitute a smaller recommended preset or add blanket ignores to get a green result. Ask me before disabling a rule, weakening its options, or adding an exemption.
 
-For shadcn UI projects, use Tailwind CSS v4 and a project-local `components.json` pointing at the real theme CSS and UI component alias. Ensure the alias resolves through your TypeScript paths or package exports. Without that setup, component rules can miss components and class validation can fall back to the plugin's bundled grammar. In a monorepo, configure each UI project separately.
+These are opinions about how I want to start a project. The Effect rules prescribe Effect patterns, and shadcn lint assumes a component design system. If those assumptions don't fit the project, explain the conflict before changing the policy or adding a framework.
 
-## What's enforced
+Existing projects need a separate assessment before applying fixes that could change behavior or appearance. Setting up lint is not permission to rewrite GitHub Actions.
 
-The complete default contains 30 explicitly configured errors: 18 general anti-slop rules, all five Effect-specific anti-slop rules, all six shadcn rules, and Oxlint's native accumulating-spread check. Oxlint's own default rules also remain active.
+## Rule inventory
 
-The Effect rules are included deliberately. They prescribe Effect APIs for tagged values and services and can flag similar patterns in code that does not use Effect. The shadcn rules enforce a token-based component design system. These are architectural opinions, not proof that every flagged program is broken.
-
-There are no blanket test, mock, or component-directory exemptions. Every plugin rule uses its default options. In particular, shadcn's `no-restyle` does not receive the upstream example's layout allowance. Upstream recommends component-directory overrides for some rules; this complete preset does not add them. A project that needs exceptions should make that policy explicit in its own config.
+This inventory records the initial selection: 18 general anti-slop rules, five Effect rules, six shadcn rules, and one native Oxlint rule. The agent should check upstream for additions and explain any changes to this list.
 
 ### anti-slop
 
@@ -74,17 +71,3 @@ There are no blanket test, mock, or component-directory exemptions. Every plugin
 ### oxc
 
 - `oxc/no-accumulating-spread`
-
-## Versioning and verification
-
-Plugin dependencies and the Oxlint peer version are pinned. Adopt a new config release deliberately; new enforced rules can require changes in consuming projects. Rule additions or stricter options will be called out as breaking policy changes.
-
-`npm test` checks the complete upstream rule inventory and runs real Oxlint processes from a separate project directory. Valid TypeScript passes; representative anti-slop and Effect violations and all six shadcn violations fail. This verifies integration, not every upstream rule's implementation or application behavior.
-
-## Credits
-
-- [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop), vendored at `c44ef22ca116d0ba62a3ff663a0bd13a3f3fa40b` because upstream distributes source rather than an npm package. Original production source is unmodified; `npm run build` strips types and rewrites local import extensions into the committed JavaScript under `dist`. License notices are preserved under `vendor/anti-slop`.
-- [shadcn-ui/lint](https://github.com/shadcn-ui/lint), installed as `@shadcn/lint@0.1.0`.
-- [Oxlint](https://oxc.rs/docs/guide/usage/linter.html), version `1.83.0`.
-
-MIT licensed. Third-party source retains its own notices.

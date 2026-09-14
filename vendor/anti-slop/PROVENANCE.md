@@ -1,1 +1,0 @@
-Vendored from https://github.com/dmmulroy/anti-slop at c44ef22ca116d0ba62a3ff663a0bd13a3f3fa40b. Production src files are unmodified; upstream tests are excluded. MIT license retained, including nested third-party notices.
